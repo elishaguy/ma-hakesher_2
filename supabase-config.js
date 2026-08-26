@@ -3,8 +3,8 @@
    code: the anon key only allows whatever the database's Row Level Security
    rules (set up by supabase_setup.sql) explicitly permit, nothing more. */
 
-const SUPABASE_URL = "YOUR_SUPABASE_URL"; // looks like https://xxxxxxxx.supabase.co
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+const SUPABASE_URL = "https://lneyendaneogyofhnvge.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_U-0IOIEocSYpFW4LspTTmQ_4Zpy7Lwg";
 
 const supabaseClient =
   SUPABASE_URL.startsWith("http") && SUPABASE_ANON_KEY.length > 20 && window.supabase
