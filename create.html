@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>יצירת משחק - מה הקשר?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="hero">
+    <div class="logo">🎨</div>
+    <h1>יצירת משחק "מה הקשר"</h1>
+    <div class="msg">בואו נבנה משחק! בסוף תקבלו קישור אחד לשיתוף - בלי צורך בהרשמה או התקנה.</div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="creator-instructions">
+      <h2>איך זה עובד? 🤔</h2>
+      <p>כל לוח מורכב מ-4 קטגוריות, ובכל קטגוריה 4 מילים שקשורות זו לזו. כדאי לשלב קטגוריות אישיות עם קטגוריות כלליות, כדי שגם מי שלא מכיר את כל הפרטים האישיים יוכל להשתתף.</p>
+
+      <p class="widget-intro">נסו בעצמכם - הנה לוח לדוגמה. לחצו על 4 מילים שלדעתכם/ן שייכות לאותה קטגוריה, ואז על "בדקו":</p>
+      <div id="example-widget" class="ew-wrap"></div>
+
+      <h2>עכשיו בואו נבנה לוח טוב 🛠️</h2>
+      <p>אפשר להשתמש, לדוגמה, בקטגוריות אישיות, אבל גם כדאי לשלב קטגוריות כלליות שכולם יכירו.</p>
+
+      <h3>קטגוריות אישיות, לדוגמה:</h3>
+      <ul>
+        <li>מקומות שסבתא גרה בהם</li>
+        <li>ערים שישנו בהן בטרק בשוויץ</li>
+        <li>שמות של חיות המחמד של סבתא לאורך השנים</li>
+      </ul>
+
+      <h3>אפשר גם לשלב קטגוריות כלליות:</h3>
+      <ul>
+        <li>איים בים התיכון</li>
+        <li>קיבוצים בצפון</li>
+        <li>ציפורים ישראליות נפוצות</li>
+      </ul>
+
+      <h3>קטגוריות "משחק מילים" תמיד עובדות טוב:</h3>
+      <div class="example">עין ___ : גדי, כרם, חרוד, הוד</div>
+      <div class="example">ראש ___ : השנה, הניקרה, העין, פינה</div>
+
+      <h3>סדר הקטגוריות = דרגת הקושי</h3>
+      <p>אין צורך לבחור דרגת קושי בנפרד - סדר הכנסת הקטגוריות בלוח הוא הקושי שלהן: הקטגוריה הראשונה תופיע בירוק (הכי קלה), השנייה בצהוב, השלישית בכתום, והרביעית באדום (הכי קשה). כדאי לסדר אותן מהכי קלה עד הכי קשה.</p>
+
+      <h3>בחירת "רמז"</h3>
+      <p>לכל לוח בוחרים 2 מילים שישמשו כרמז. מומלץ לבחור שתי מילים שקל לחשוב שהן מתחברות למילים אחרות בלוח (ונראה כאילו הן שייכות לקטגוריה שונה) - אבל למעשה הן שייכות לאותה קבוצה בדיוק. למשל בדוגמה למעלה, "פריז" ו"דיזינגוף": קל לחשוב ש"פריז" קשורה לערים באירופה, אבל בלוח הזה היא בכלל שייכת לקטגוריית הכיכרות בישראל, יחד עם דיזינגוף.</p>
+    </div>
+
+    <div id="draft-restored-note" class="msg-banner" style="display:none">טיוטה קודמת שחזרה אוטומטית ✏️</div>
+
+    <div class="field">
+      <label for="game-title">כותרת המשחק (אופציונלי)</label>
+      <input type="text" id="game-title" placeholder="לדוגמה: יום הולדת 80 לסבתא" />
+    </div>
+
+    <div class="field">
+      <label for="game-note">הודעה אישית (אופציונלי)</label>
+      <textarea id="game-note" placeholder="לדוגמה: מזל טוב סבתא יקרה! הכנו לך כמה חידות מהכיף שלנו ביחד 💛"></textarea>
+    </div>
+
+    <div class="field">
+      <label for="game-createdby">השם שלכם (אופציונלי, יופיע בלוח בתור "נכתב על ידי")</label>
+      <input type="text" id="game-createdby" placeholder="לדוגמה: גיא" />
+    </div>
+
+    <div class="boards-header">
+      <h2>לוחות המשחק</h2>
+      <span class="boards-count" id="boards-count">0/10 לוחות</span>
+    </div>
+
+    <div id="boards-container"></div>
+
+    <button class="add-board-btn" id="add-board-btn">+ הוספת לוח</button>
+
+    <div id="error-box" class="error-box" style="display:none"></div>
+
+    <button class="generate-btn" id="generate-btn">✅ צרו קישור לשיתוף</button>
+
+    <div id="result-box" class="result-box" style="display:none">
+      <h3>המשחק מוכן! 🎉</h3>
+      <div class="link-row">
+        <input type="text" id="result-link" readonly />
+        <button class="action secondary" id="copy-link-btn">העתקה</button>
+      </div>
+      <div class="btn-row">
+        <a class="action whatsapp" id="whatsapp-btn" target="_blank" rel="noopener">שיתוף בוואטסאפ 💬</a>
+        <a class="action secondary" id="preview-btn" target="_blank" rel="noopener">תצוגה מקדימה 👀</a>
+      </div>
+    </div>
+
+    <footer class="credit">
+      נבנה על ידי ד"ר גיא אלישע 💛<br />
+      <a href="https://www.linkedin.com/in/guy-elisha-30a5801b4/" target="_blank" rel="noopener">LinkedIn</a>
+      &nbsp;·&nbsp;
+      <a href="index.html">חזרה לעמוד הבית</a>
+    </footer>
+  </div>
+
+  <script src="util.js"></script>
+  <script src="data.js"></script>
+  <script src="example-widget.js"></script>
+  <script src="create.js"></script>
+</body>
+</html>

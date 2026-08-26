@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>מה הקשר?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div id="player-view">
+    <div class="hero">
+      <div class="logo">🧩</div>
+      <h1 id="hero-title">מה הקשר</h1>
+      <div class="msg" id="hero-note" style="display:none"></div>
+    </div>
+
+    <div class="wrap">
+      <div id="demo-banner" class="demo-banner" style="display:none">
+        🎨 זהו משחק לדוגמה. <a href="create.html">רוצים ליצור את המשחק שלכם? לחצו כאן</a>
+      </div>
+
+      <details class="howto">
+        <summary>איך משחקים? 📖</summary>
+        <ul>
+          <li>בכל לוח יש 16 מילים, שמתחלקות ל-4 קבוצות של 4 מילים לפי קשר משותף.</li>
+          <li>לוחצים/ות על 4 מילים שלדעתכם/ן שייכות לאותה קבוצה, ואז לוחצים/ות "הגישו".</li>
+          <li>יש לכם/ן 5 נסיונות לכל לוח. אם בחרתם/ן 3 מתוך 4 נכון - תקבלו/תקבלנה הודעה על כך.</li>
+          <li>תקועים/ות? לחצו/לחצנה על "רמז" - שתי מילים מאותה קבוצה יסומנו עבורכם/ן, ותוכלו/תוכלנה לבחור עוד שתיים.</li>
+          <li>בסיום, אפשר לשתף את התוצאה בוואטסאפ.</li>
+        </ul>
+        <div class="legend">
+          <span><span class="dot g1"></span> קל</span>
+          <span><span class="dot g2"></span> בינוני</span>
+          <span><span class="dot g3"></span> קשה</span>
+          <span><span class="dot g4"></span> הכי קשה</span>
+        </div>
+      </details>
+
+      <div id="connections-list-view">
+        <div id="connections-list"></div>
+      </div>
+      <div id="connections-board-view" style="display:none"></div>
+
+      <footer class="credit">
+        נבנה על ידי ד"ר גיא אלישע 💛<br />
+        <a href="https://www.linkedin.com/in/guy-elisha-30a5801b4/" target="_blank" rel="noopener">LinkedIn</a>
+        &nbsp;·&nbsp;
+        <a href="index.html">רוצים ליצור משחק משלכם? לחצו כאן</a>
+      </footer>
+    </div>
+  </div>
+
+  <script src="util.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
