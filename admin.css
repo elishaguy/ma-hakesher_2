@@ -1,0 +1,85 @@
+/* Admin-only styling, on top of the shared styles.css design system. */
+
+.admin-hint {
+  font-size: 13px;
+  color: var(--ink-light);
+  text-align: center;
+  margin-top: 14px;
+}
+
+.admin-logout-btn {
+  flex: 0 0 auto;
+  padding: 8px 16px;
+}
+
+.stat-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.stat-box {
+  flex: 1;
+  min-width: 130px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+}
+.stat-num {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: "Frank Ruhl Libre", serif;
+}
+.stat-label {
+  font-size: 13px;
+  color: var(--ink-light);
+  margin-top: 4px;
+}
+
+.admin-game-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.admin-game-head { margin-bottom: 10px; }
+.admin-game-title { font-size: 17px; font-weight: 700; }
+.admin-game-meta { font-size: 12px; color: var(--ink-light); margin-top: 2px; }
+.admin-game-meta code {
+  background: var(--tile-bg);
+  padding: 1px 6px;
+  border-radius: 6px;
+  direction: ltr;
+  display: inline-block;
+}
+
+.admin-board {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+.admin-board-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+.admin-cat { font-size: 12px; color: var(--ink-light); margin-bottom: 2px; }
+.admin-stat-note { font-size: 12px; color: var(--ink-light); margin-top: 6px; }
+
+.admin-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-top: 6px;
+}
+.admin-bar-row span:first-child { flex: 0 0 90px; }
+.admin-bar-row span:last-child { flex: 0 0 76px; text-align: left; direction: ltr; }
+.admin-bar {
+  flex: 1;
+  height: 10px;
+  background: var(--tile-bg);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.admin-bar-fill { height: 100%; background: var(--green); }
+.admin-bar-fill.fail { background: var(--red); }

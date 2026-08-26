@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ניהול - מה הקשר?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <div class="hero">
+    <div class="logo">🔐</div>
+    <h1>ניהול האתר</h1>
+  </div>
+
+  <div class="wrap">
+    <div id="backend-missing" class="empty-note" style="display:none">
+      החיבור לשרת (Supabase) עדיין לא הוגדר באתר הזה. 😕<br />
+      עברו על ההוראות ב-BACKEND_SETUP.md כדי להשלים את ההגדרה.
+    </div>
+
+    <div id="login-view" style="display:none">
+      <form id="login-form">
+        <div class="field">
+          <label for="login-email">אימייל</label>
+          <input type="email" id="login-email" required />
+        </div>
+        <div class="field">
+          <label for="login-password">סיסמה</label>
+          <input type="password" id="login-password" required />
+        </div>
+        <div id="login-error" class="error-box" style="display:none"></div>
+        <button type="submit" class="generate-btn">התחברות</button>
+      </form>
+      <p class="admin-hint">גישה זמינה רק למי שיש לו חשבון מנהל שהוגדר ב-Supabase (ראו BACKEND_SETUP.md).</p>
+    </div>
+
+    <div id="dashboard-view" style="display:none">
+      <div class="boards-header">
+        <h2>סקירה כללית</h2>
+        <button id="logout-btn" class="action secondary admin-logout-btn">התנתקות</button>
+      </div>
+      <div id="visit-summary" class="stat-row"></div>
+
+      <div class="boards-header">
+        <h2>כל המשחקים שנוצרו</h2>
+      </div>
+      <div id="games-list"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

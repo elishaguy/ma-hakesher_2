@@ -34,32 +34,54 @@ function hashId(str) {
 
 /* ---------- Bootstrap: decide home vs player, and load the right data ---------- */
 
-function initApp() {
-  const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "";
-  const params = new URLSearchParams(hash);
+async function initApp() {
+  const shortId = new URLSearchParams(window.location.search).get("id");
 
-  if (params.has("g")) {
-    try {
-      GAME = decodeGameData(params.get("g"));
-      GAME._id = hashId(params.get("g"));
-    } catch (e) {
-      showLoadError("הקישור הזה לא תקין או פגום. 😕<br />בקשו מהשולח/ת קישור חדש, או צרו משחק משלכם.");
+  if (shortId) {
+    if (!backendReady()) {
+      showLoadError("הקישור הזה דורש חיבור לשרת שעדיין לא הוגדר באתר הזה. 😕");
       return;
     }
-  } else if (params.get("demo") === "1") {
-    GAME = DEMO_DATA;
-    GAME._id = "demo";
-    const banner = document.getElementById("demo-banner");
-    if (banner) banner.style.display = "block";
+    try {
+      const { data, error } = await supabaseClient.rpc("get_game_by_code", { p_code: shortId });
+      const row = Array.isArray(data) ? data[0] : data;
+      if (error || !row) throw error || new Error("game not found");
+      GAME = { title: row.title, note: row.note, createdBy: row.created_by, tries: row.tries, boards: row.boards };
+      GAME._id = "sb_" + shortId;
+      GAME._dbId = row.id;
+    } catch (e) {
+      showLoadError("הקישור הזה לא נמצא. 😕<br />בקשו מהשולח/ת קישור חדש, או צרו משחק משלכם.");
+      return;
+    }
   } else {
-    showLoadError('זה עמוד המשחק - אבל לא נשלח אליו שום משחק. 🤔<br />אם קיבלתם קישור למשחק, ודאו שהעתקתם אותו במלואו.<br />רוצים ליצור משחק חדש? <a href="create.html">לחצו כאן</a>.');
-    return;
+    const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "";
+    const hashParams = new URLSearchParams(hash);
+
+    if (hashParams.has("g")) {
+      try {
+        GAME = decodeGameData(hashParams.get("g"));
+        GAME._id = hashId(hashParams.get("g"));
+      } catch (e) {
+        showLoadError("הקישור הזה לא תקין או פגום. 😕<br />בקשו מהשולח/ת קישור חדש, או צרו משחק משלכם.");
+        return;
+      }
+    } else if (hashParams.get("demo") === "1") {
+      GAME = DEMO_DATA;
+      GAME._id = "demo";
+      const banner = document.getElementById("demo-banner");
+      if (banner) banner.style.display = "block";
+    } else {
+      showLoadError('זה עמוד המשחק - אבל לא נשלח אליו שום משחק. 🤔<br />אם קיבלתם קישור למשחק, ודאו שהעתקתם אותו במלואו.<br />רוצים ליצור משחק חדש? <a href="create.html">לחצו כאן</a>.');
+      return;
+    }
   }
 
   if (!GAME || !Array.isArray(GAME.boards) || GAME.boards.length === 0) {
     showLoadError("הקישור הזה לא תקין או פגום. 😕<br />בקשו מהשולח/ת קישור חדש, או צרו משחק משלכם.");
     return;
   }
+
+  logVisit("play", GAME._dbId || null);
 
   STATE = loadState();
   if (!STATE.connections) STATE.connections = {};
@@ -141,6 +163,7 @@ function getOrInitBoardState(idx) {
       solveHistory: [],
       guessHistory: [], // every submitted guess, each an array of 4 group numbers, in submission order
       justSolved: null, // group number solved by the most recent guess, so only that row plays the reveal animation
+      resultLogged: false, // guards against logging the same finished board more than once
     };
     saveState();
   }
@@ -186,6 +209,16 @@ function renderBoardView() {
   const finished = st.solvedGroups.length === 4 || st.triesLeft === 0;
   const clueGroup = getClueGroup(board, st);
   const clueDisabled = clueGroup !== null && st.solvedGroups.includes(clueGroup);
+
+  if (finished && !st.resultLogged) {
+    st.resultLogged = true;
+    saveState();
+    logPlayResult(GAME._dbId, currentBoardIndex, {
+      mistakes: getTries() - st.triesLeft,
+      usedClue: st.clueUsed,
+      solved: st.solvedGroups.length === 4,
+    });
+  }
 
   let tilesHtml = "";
   if (!finished) {

@@ -39,6 +39,21 @@ function buildShareUrl(gameObj) {
   return url.toString();
 }
 
+/* Short, easy-to-read code for backend-saved games. Excludes visually
+   confusable characters (0/O, 1/l/I). */
+function generateShortCode(len = 8) {
+  const chars = "23456789abcdefghjkmnpqrstuvwxyzACDEFGHJKMNPQRSTUVWXYZ";
+  let s = "";
+  for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return s;
+}
+
+function buildShortShareUrl(shortCode) {
+  const url = new URL("play.html", window.location.href);
+  url.searchParams.set("id", shortCode);
+  return url.toString();
+}
+
 async function shareOrCopy(text, url) {
   const full = url ? text + "\n" + url : text;
   if (navigator.share) {

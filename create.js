@@ -255,7 +255,42 @@ function buildGameFromDraft() {
   };
 }
 
-function onGenerateClick() {
+function getOrCreateCreatorKey() {
+  let key = localStorage.getItem("meha_kesher_creator_key");
+  if (!key) {
+    key = generateShortCode(16);
+    localStorage.setItem("meha_kesher_creator_key", key);
+  }
+  return key;
+}
+
+/* Saves the game to Supabase and returns a short play.html?id=... link.
+   Returns null (never throws) if the backend isn't configured or the save
+   fails, so the caller can fall back to the old self-contained long link. */
+async function saveGameToBackend(game) {
+  const creatorKey = getOrCreateCreatorKey();
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const shortCode = generateShortCode();
+    const { error } = await supabaseClient.from("games").insert({
+      short_code: shortCode,
+      title: game.title,
+      note: game.note,
+      created_by: game.createdBy,
+      creator_key: creatorKey,
+      tries: game.tries,
+      boards: game.boards,
+    });
+    if (!error) return buildShortShareUrl(shortCode);
+    if (error.code !== "23505") {
+      console.error("Supabase save failed:", error);
+      return null;
+    }
+    // 23505 = unique_violation on short_code - vanishingly rare, just retry with a new code
+  }
+  return null;
+}
+
+async function onGenerateClick() {
   const errors = validateDraft();
   const errorBox = document.getElementById("error-box");
   const resultBox = document.getElementById("result-box");
@@ -270,7 +305,21 @@ function onGenerateClick() {
 
   errorBox.style.display = "none";
   const game = buildGameFromDraft();
-  const url = buildShareUrl(game);
+
+  const genBtn = document.getElementById("generate-btn");
+  genBtn.disabled = true;
+  genBtn.textContent = "רגע, יוצרים קישור...";
+
+  let url = null;
+  if (backendReady()) {
+    url = await saveGameToBackend(game);
+  }
+  if (!url) {
+    url = buildShareUrl(game); // fallback: everything baked into the link itself, no backend needed
+  }
+
+  genBtn.disabled = false;
+  genBtn.textContent = "✅ צרו קישור לשיתוף";
 
   document.getElementById("result-link").value = url;
   const shareText = `בואו לשחק "${game.title || "מה הקשר"}" 🧩`;
@@ -278,6 +327,8 @@ function onGenerateClick() {
   document.getElementById("preview-btn").href = url;
   resultBox.style.display = "block";
   resultBox.scrollIntoView({ behavior: "smooth", block: "center" });
+
+  loadMyGames();
 }
 
 async function onCopyClick() {
@@ -292,6 +343,37 @@ async function onCopyClick() {
   const original = btn.textContent;
   btn.textContent = "הועתק! ✓";
   setTimeout(() => (btn.textContent = original), 1500);
+}
+
+/* ---------- Creator's own past games (backend-saved only) ---------- */
+
+async function loadMyGames() {
+  if (!backendReady()) return;
+  const section = document.getElementById("my-games-section");
+  const container = document.getElementById("my-games-list");
+  if (!section || !container) return;
+
+  const creatorKey = getOrCreateCreatorKey();
+  const { data, error } = await supabaseClient.rpc("get_my_games", { p_creator_key: creatorKey });
+  if (error || !data || data.length === 0) {
+    section.style.display = "none";
+    return;
+  }
+
+  container.innerHTML = data
+    .map((g) => {
+      const url = buildShortShareUrl(g.short_code);
+      const date = new Date(g.created_at).toLocaleDateString("he-IL");
+      return `<div class="card card-list-item" style="cursor:default">
+        <div>
+          <div class="title">${escapeAttr(g.title || "(ללא כותרת)")}</div>
+          <div class="sub">${date}</div>
+        </div>
+        <a class="action secondary" style="flex:0 0 auto;padding:8px 14px" href="${url}" target="_blank" rel="noopener">פתיחה</a>
+      </div>`;
+    })
+    .join("");
+  section.style.display = "block";
 }
 
 /* ---------- Init ---------- */
@@ -329,6 +411,9 @@ function initCreator() {
 
   document.getElementById("generate-btn").addEventListener("click", onGenerateClick);
   document.getElementById("copy-link-btn").addEventListener("click", onCopyClick);
+
+  logVisit("create");
+  loadMyGames();
 }
 
 document.addEventListener("DOMContentLoaded", initCreator);
