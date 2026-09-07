@@ -567,6 +567,37 @@ footer.credit a { color: var(--accent); font-weight: 600; text-decoration: none;
 .ew-buttons .ew-reset { background: var(--tile-bg); color: var(--ink); }
 .ew-done { text-align: center; font-size: 14px; font-weight: 600; margin-top: 4px; }
 
+/* ===================== Per-board play stats ===================== */
+/* Shared by the admin dashboard and the creator's own "my games" results view. */
+
+.stat-board {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+.stat-board-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+.stat-cat { font-size: 12px; color: var(--ink-light); margin-bottom: 2px; }
+.stat-note { font-size: 12px; color: var(--ink-light); margin-top: 6px; }
+
+.stat-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-top: 6px;
+}
+.stat-bar-row span:first-child { flex: 0 0 90px; }
+.stat-bar-row span:last-child { flex: 0 0 76px; text-align: left; direction: ltr; }
+.stat-bar {
+  flex: 1;
+  height: 10px;
+  background: var(--tile-bg);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.stat-bar-fill { height: 100%; background: var(--green); }
+.stat-bar-fill.fail { background: var(--red); }
+
 /* ===================== Mobile ===================== */
 @media (max-width: 380px) {
   .home-hero h1 { font-size: 32px; }

@@ -364,16 +364,96 @@ async function loadMyGames() {
     .map((g) => {
       const url = buildShortShareUrl(g.short_code);
       const date = new Date(g.created_at).toLocaleDateString("he-IL");
-      return `<div class="card card-list-item" style="cursor:default">
-        <div>
-          <div class="title">${escapeAttr(g.title || "(ללא כותרת)")}</div>
-          <div class="sub">${date}</div>
+      return `<div class="my-game-card">
+        <div class="card card-list-item" style="cursor:default;margin-bottom:0">
+          <div>
+            <div class="title">${escapeAttr(g.title || "(ללא כותרת)")}</div>
+            <div class="sub">${date}</div>
+          </div>
+          <div style="display:flex;gap:8px;flex:0 0 auto">
+            <button type="button" class="action secondary my-game-stats-btn" data-game-id="${g.id}" style="padding:8px 14px">תוצאות</button>
+            <a class="action secondary" style="padding:8px 14px" href="${url}" target="_blank" rel="noopener">פתיחה</a>
+          </div>
         </div>
-        <a class="action secondary" style="flex:0 0 auto;padding:8px 14px" href="${url}" target="_blank" rel="noopener">פתיחה</a>
+        <div class="my-game-stats" data-stats-for="${g.id}" style="display:none"></div>
       </div>`;
     })
     .join("");
   section.style.display = "block";
+
+  container.querySelectorAll(".my-game-stats-btn").forEach((btn) => {
+    btn.addEventListener("click", () => onMyGameStatsClick(btn));
+  });
+}
+
+async function onMyGameStatsClick(btn) {
+  const gameId = btn.dataset.gameId;
+  const panel = document.querySelector(`[data-stats-for="${gameId}"]`);
+  if (!panel) return;
+
+  if (panel.dataset.loaded === "1") {
+    panel.style.display = panel.style.display === "none" ? "block" : "none";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "טוען...";
+  const creatorKey = getOrCreateCreatorKey();
+  const { data, error } = await supabaseClient.rpc("get_my_game_stats", { p_creator_key: creatorKey, p_game_id: gameId });
+  btn.disabled = false;
+  btn.textContent = "תוצאות";
+
+  const row = Array.isArray(data) ? data[0] : data;
+  if (error || !row) {
+    panel.innerHTML = '<div class="stat-note">לא הצלחנו לטעון תוצאות כרגע.</div>';
+  } else {
+    const boards = row.boards || [];
+    const plays = row.plays || [];
+    panel.innerHTML = boards.map((board, bi) => renderMyBoardStats(board, plays.filter((p) => p.board_index === bi), bi)).join("");
+  }
+  panel.dataset.loaded = "1";
+  panel.style.display = "block";
+}
+
+function renderMyBoardStats(board, boardPlays, bi) {
+  const catsHtml = (board.categories || [])
+    .map((c) => `<div class="stat-cat">${escapeAttr(c.title)}: ${(c.words || []).map(escapeAttr).join(", ")}</div>`)
+    .join("");
+
+  const total = boardPlays.length;
+  if (total === 0) {
+    return `<div class="stat-board">
+      <div class="stat-board-title">לוח ${bi + 1}</div>
+      ${catsHtml}
+      <div class="stat-note">אף אחד עדיין לא שיחק בלוח הזה.</div>
+    </div>`;
+  }
+
+  const solved = boardPlays.filter((p) => p.solved);
+  const notSolved = total - solved.length;
+  const withClue = solved.filter((p) => p.used_clue).length;
+
+  const byMistakes = {};
+  solved.forEach((p) => {
+    byMistakes[p.mistakes] = (byMistakes[p.mistakes] || 0) + 1;
+  });
+
+  const pct = (n) => Math.round((n / total) * 100);
+  let rows = "";
+  Object.keys(byMistakes)
+    .sort((a, b) => a - b)
+    .forEach((m) => {
+      const n = byMistakes[m];
+      const label = m === "0" ? "ניחוש ראשון" : `אחרי ${m} טעויות`;
+      rows += `<div class="stat-bar-row"><span>${label}</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${pct(n)}%"></div></div><span>${pct(n)}% (${n})</span></div>`;
+    });
+  rows += `<div class="stat-bar-row"><span>לא פתרו</span><div class="stat-bar"><div class="stat-bar-fill fail" style="width:${pct(notSolved)}%"></div></div><span>${pct(notSolved)}% (${notSolved})</span></div>`;
+
+  return `<div class="stat-board">
+    <div class="stat-board-title">לוח ${bi + 1} - ${total} שיחקו · ${withClue} השתמשו ברמז</div>
+    ${catsHtml}
+    ${rows}
+  </div>`;
 }
 
 /* ---------- Init ---------- */

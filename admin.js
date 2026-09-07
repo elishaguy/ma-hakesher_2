@@ -97,15 +97,15 @@ function renderGamesList(games, plays) {
 
 function renderBoardStats(board, boardPlays, bi) {
   const catsHtml = (board.categories || [])
-    .map((c) => `<div class="admin-cat">${escapeHtml(c.title)}: ${(c.words || []).map(escapeHtml).join(", ")}</div>`)
+    .map((c) => `<div class="stat-cat">${escapeHtml(c.title)}: ${(c.words || []).map(escapeHtml).join(", ")}</div>`)
     .join("");
 
   const total = boardPlays.length;
   if (total === 0) {
-    return `<div class="admin-board">
-      <div class="admin-board-title">לוח ${bi + 1}</div>
+    return `<div class="stat-board">
+      <div class="stat-board-title">לוח ${bi + 1}</div>
       ${catsHtml}
-      <div class="admin-stat-note">אף אחד עדיין לא שיחק בלוח הזה.</div>
+      <div class="stat-note">אף אחד עדיין לא שיחק בלוח הזה.</div>
     </div>`;
   }
 
@@ -125,12 +125,12 @@ function renderBoardStats(board, boardPlays, bi) {
     .forEach((m) => {
       const n = byMistakes[m];
       const label = m === "0" ? "ניחוש ראשון" : `אחרי ${m} טעויות`;
-      rows += `<div class="admin-bar-row"><span>${label}</span><div class="admin-bar"><div class="admin-bar-fill" style="width:${pct(n)}%"></div></div><span>${pct(n)}% (${n})</span></div>`;
+      rows += `<div class="stat-bar-row"><span>${label}</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${pct(n)}%"></div></div><span>${pct(n)}% (${n})</span></div>`;
     });
-  rows += `<div class="admin-bar-row"><span>לא פתרו</span><div class="admin-bar"><div class="admin-bar-fill fail" style="width:${pct(notSolved)}%"></div></div><span>${pct(notSolved)}% (${notSolved})</span></div>`;
+  rows += `<div class="stat-bar-row"><span>לא פתרו</span><div class="stat-bar"><div class="stat-bar-fill fail" style="width:${pct(notSolved)}%"></div></div><span>${pct(notSolved)}% (${notSolved})</span></div>`;
 
-  return `<div class="admin-board">
-    <div class="admin-board-title">לוח ${bi + 1} - ${total} שיחקו · ${withClue} השתמשו ברמז</div>
+  return `<div class="stat-board">
+    <div class="stat-board-title">לוח ${bi + 1} - ${total} שיחקו · ${withClue} השתמשו ברמז</div>
     ${catsHtml}
     ${rows}
   </div>`;
