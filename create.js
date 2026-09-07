@@ -348,15 +348,21 @@ async function onCopyClick() {
 /* ---------- Creator's own past games (backend-saved only) ---------- */
 
 async function loadMyGames() {
-  if (!backendReady()) return;
   const section = document.getElementById("my-games-section");
   const container = document.getElementById("my-games-list");
   if (!section || !container) return;
 
+  section.style.display = "block"; // always visible - shows an empty-state message instead of hiding
+
+  if (!backendReady()) {
+    container.innerHTML = '<div class="empty-note">התכונה הזו דורשת חיבור לשרת שעדיין לא הוגדר באתר הזה.</div>';
+    return;
+  }
+
   const creatorKey = getOrCreateCreatorKey();
   const { data, error } = await supabaseClient.rpc("get_my_games", { p_creator_key: creatorKey });
   if (error || !data || data.length === 0) {
-    section.style.display = "none";
+    container.innerHTML = '<div class="empty-note">אין משחקים קודמים - אחרי שתיצרו לוח ראשון, הוא יופיע כאן.</div>';
     return;
   }
 
